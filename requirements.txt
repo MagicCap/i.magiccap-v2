@@ -1,0 +1,6 @@
+sanic==19.3.1
+sanic-cors
+rethinkdb==2.3.0.post6
+aiobotocore
+sentry-sdk==0.8.0
+aiocontextvars==0.2.2

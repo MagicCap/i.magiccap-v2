@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: i-magiccap
+spec:
+  selector:
+    matchLabels:
+      run: i-magiccap
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: i-magiccap
+    spec:
+      containers:
+      - name: i-magiccap
+        image: registry.jakegealer.me/i-magiccap
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8000
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: RETHINKDB_HOSTNAME
+          value: rethinkdb-rethinkdb-cluster
+        - name: RETHINKDB_PASSWORD
+          value: rethinkdb
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: i-magiccap-v2
+              key: sentry
+        - name: AWS_ENDPOINT
+          value: https://sfo2.digitaloceanspaces.com
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: i-magiccap-v2
+              key: secret_key
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: i-magiccap-v2
+              key: key_id
+        - name: AWS_BUCKET
+          value: i-magiccap
+      imagePullSecrets:
+      - name: private-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: i-magiccap
+  labels:
+    run: i-magiccap
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+  selector:
+    run: i-magiccap
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: i-magiccap-prod-letsencrypt
+spec:
+  secretName: i-magiccap-prod-letsencrypt
+  dnsNames:
+  - i.magiccap.me
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - i.magiccap.me
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: i-magiccap-ingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - i.magiccap.me
+    secretName: i-magiccap-prod-letsencrypt
+  rules:
+  - host: i.magiccap.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: i-magiccap
+          servicePort: 8000
