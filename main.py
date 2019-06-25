@@ -150,8 +150,6 @@ async def upload(req: Request):
 @app.route("/<item>")
 async def image_view(req, item):
     """Loads a image view."""
-    session = aiobotocore.get_session(loop=app.loop)
-
     try:
         get_res = await app.client.get_object(Bucket=os.environ['AWS_BUCKET'], Key=item)
         return response.stream(SanicS3Stream(get_res), content_type=get_res['ContentType'])
