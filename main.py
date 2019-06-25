@@ -16,6 +16,16 @@ import botocore
 # Imports go here.
 
 
+class SanicS3Stream:
+    def __init__(self, response):
+        self.s3_response = response
+
+    async def __call__(self, response):
+        async with self.s3_response['Body'] as stream:
+            async for chunk in stream.iter_chunks():
+                await response.write(chunk[0])
+
+
 class RethinkSanic(Sanic):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -141,8 +151,7 @@ async def image_view(req, item):
 
     try:
         get_res = await app.client.get_object(Bucket=os.environ['AWS_BUCKET'], Key=item)
-        async with get_res['Body'] as stream:
-            return response.raw(await stream.read(), content_type=get_res['ContentType'])
+        return response.stream(SanicS3Stream(get_res), content_type=get_res['ContentType'])
     except botocore.exceptions.ClientError:
         return response.text("Not found.", status=404)
 
