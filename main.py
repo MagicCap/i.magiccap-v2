@@ -7,13 +7,16 @@ from sanic import Sanic, response
 from sanic.request import Request
 from sanic.exceptions import NotFound
 from sanic_cors import CORS
-import rethinkdb as r
+from rethinkdb import RethinkDB
 import os
 import random
 import string
 import aiobotocore
 import botocore
 # Imports go here.
+
+r = RethinkDB()
+# Defines the RethinkDB driver.
 
 
 class SanicS3Stream:

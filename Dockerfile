@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.7-stretch
 COPY . .
 RUN pip install -r requirements.txt
 EXPOSE 8000
