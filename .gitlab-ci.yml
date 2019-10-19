@@ -27,6 +27,6 @@ deploy:
     - "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
     - "chmod +x ./kubectl"
     - "mv ./kubectl /usr/local/bin/kubectl"
-    - "wget --header \"Content-Type: application/json\" --header \"Authorization: Bearer $DIGITALOCEAN_TOKEN\" \"https://api.digitalocean.com/v2/kubernetes/clusters/e7e5e2f5-971e-4d09-8ed8-ac5c4c02be0d/kubeconfig\""
+    - "wget --header \"Content-Type: application/json\" --header \"Authorization: Bearer $DIGITALOCEAN_TOKEN\" \"https://api.digitalocean.com/v2/kubernetes/clusters/b9a8389f-646a-47ba-85ec-ec2de6866e75/kubeconfig\""
     - "kubectl --kubeconfig=./kubeconfig rollout restart statefulset/i-magiccap"
   stage: deploy
