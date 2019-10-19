@@ -108,6 +108,12 @@ async def root_redirect(_):
     return response.redirect("https://magiccap.me")
 
 
+@app.route("/healthcheck")
+async def healthcheck(_):
+    """A simple healthcheck."""
+    return response.json(200)
+
+
 @app.route("/upload", methods=["POST"])
 async def upload(req: Request):
     """Used to upload to i.magiccap"""
