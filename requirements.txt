@@ -2,4 +2,4 @@ sanic==19.3.1
 sanic-cors
 rethinkdb==2.4.2.post1
 aiobotocore
-sentry-sdk==0.8.0
+sentry-sdk==1.14.0
